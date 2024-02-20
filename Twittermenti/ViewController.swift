@@ -90,7 +90,7 @@ class ViewController: UIViewController {
             )).responseObject { response in
                 do {
                     let token = try response.result.get()
-                    self.updateClientWithToken(token: .init(clientID: clientID, token: token))
+                    self.client = TwitterAPIClient(.oauth20(.init(clientID: clientID, token: token)))
                     self.showAlert(title: "Success!", message: nil) {
                         self.navigationController?.popViewController(animated: true)
                     }
@@ -104,10 +104,6 @@ class ViewController: UIViewController {
         session.prefersEphemeralWebBrowserSession = true
 
         session.start()
-    }
-    
-    private func updateClientWithToken(token: TwitterAuthenticationMethod.OAuth20) {
-        self.client = TwitterAPIClient(.oauth20(token))
     }
 }
 
