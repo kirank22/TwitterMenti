@@ -4,20 +4,10 @@
 //
 //  Created by Kiran Kothapalli on 2/14/2024
 //
-
-// When authenticating with OAuth 1.0a, rewrite consumerKey and consumerSecret.
-private let consumerKey = "eJI7WV4CN0QZpr53pDgsZkKKx"
-private let consumerSecret = "f7yEWHgtEbw7JmztyH070bP1XUBE3UkTDFhNViMMuPRzJDIgrj"
-
-// If you want to authenticate with OAuth 20 Public Client, please rewrite the clientID.
-// When authenticating with OAuth 20's Confidential Client, rewrite clientID and Client Secret.
-// For more information, please visit https://github.com/mironal/TwitterAPIKit/blob/main/HowDoIAuthenticate.md
-private let clientID = "TWJFRmNkMlVXa25pcUJxbEU4V2U6MTpjaQ"
-private let clientSecret = "l42_eTqxajMAyEkw1NwvL0gfaxfP_fpp2zRDHX9_fwqZoOTtLc"
-
 import UIKit
 import TwitterAPIKit
 import AuthenticationServices
+import CoreML
 
 class ViewController: UIViewController {
     
@@ -25,43 +15,111 @@ class ViewController: UIViewController {
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var sentimentLabel: UILabel!
     
+    let sentimentClassifier = TweetSentimentClassifier()
+    
     var client: TwitterAPIClient!
     
-    private var env = Env(clientID: clientID, clientSecret: clientSecret)
-
-    @IBAction func predictPressed(_ sender: Any) {
-        Task {
-            let response = await client.v2.user.getMe(.init()).responseData
-            print(response.prettyString)
-            
+    private var env: Env {
+        //  Pull client ID from plist
+        var string = String()
+        if let infoPlistPath = Bundle.main.url(forResource: "Secrets", withExtension: "plist") {
+            do {
+                let infoPlistData = try Data(contentsOf: infoPlistPath)
+                
+                if let dict = try PropertyListSerialization.propertyList(from: infoPlistData, options: [], format: nil) as? [String: Any] {
+                    string = dict.values.first as! String
+                }
+            } catch {
+                print(error)
+            }
         }
+        return Env(clientID: string)
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
 
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
         client = TwitterAPIClient(.requestOAuth20WithPKCE(.publicClient))
         signIn()
     }
-
+    
+    //  Service call and parsing
+    @IBAction func predictPressed(_ sender: Any) {
+        if let searchText = textField.text {
+            Task {
+                var tweetsToClassify = [TweetSentimentClassifierInput]()
+                //  English tweets only for model
+                let filteredQuery = searchText + " lang:en"
+                //  Search Tweets
+                let data = try await client.v2.search.searchTweetsRecent(.init(query: filteredQuery, maxResults: 100)).responseDecodable(type: TwitterDataResponseV2<[TwitterTweetV2], TwitterTweetV2.Meta>.self).result.get().data
+                //  Convert tweets to model inputs
+                for tweet in data {
+                    let tweetToClassify = TweetSentimentClassifierInput(text: tweet.text)
+                    tweetsToClassify.append(tweetToClassify)
+                }
+                //  Pass model inputs to model
+                self.makePrediction(with: tweetsToClassify)
+            }
+        }
+    }
+    
     // MARK: - Private
-    private func signIn() {
-        let state = "xyz123" // Rewrite your state
+    private func makePrediction(with tweets: [TweetSentimentClassifierInput]) {
+        do {
+            let predictions = try self.sentimentClassifier.predictions(inputs: tweets)
+            var sentiScore = 0
+            //  Adjust overall score
+            for pred in predictions {
+                let sentiment = pred.label
+                if sentiment == "Pos" {
+                    sentiScore += 1
+                } else if sentiment == "Neg" {
+                    sentiScore -= 1
+                }
+            }
+            updateUI(with: sentiScore)
+        } catch {
+            print("There was an error with making a prediction, \(error)")
+        }
+    }
+    
+    private func updateUI(with sentimentScore: Int) {
+        if sentimentScore > 20 {
+            self.sentimentLabel.text = "😍"
+        } else if sentimentScore > 10 {
+            self.sentimentLabel.text = "😀"
+        } else if sentimentScore > 0 {
+            self.sentimentLabel.text = "🙂"
+        } else if sentimentScore == 0 {
+            self.sentimentLabel.text = "😐"
+        } else if sentimentScore > -10 {
+            self.sentimentLabel.text = "😕"
+        } else if sentimentScore > -20 {
+            self.sentimentLabel.text = "😡"
+        } else {
+            self.sentimentLabel.text = "🤮"
+        }
+    }
 
+    //  Sign In to Twitter at start
+    private func signIn() {
+        let state = "xyz123"
         let clientID = env.clientID!
+        //  Creating custom auth URL for our app
         let authorizeURL = client.auth.oauth20.makeOAuth2AuthorizeURL(.init(
             clientID: clientID,
-            redirectURI: "twittermenti-kiran://", // Rewrite your scheme
+            redirectURI: "twittermenti-kiran://",
             state: state,
             codeChallenge: "code challenge",
-            codeChallengeMethod: "plain", // OR S256
+            codeChallengeMethod: "plain",
             scopes: ["tweet.read", "tweet.write", "users.read", "offline.access"]
         ))!
 
+        //  Configure and start auth session
         let session = ASWebAuthenticationSession(url: authorizeURL, callbackURLScheme: "twittermenti-kiran") { [weak self] url, error in
             guard let self = self else { return }
 
@@ -90,6 +148,7 @@ class ViewController: UIViewController {
             )).responseObject { response in
                 do {
                     let token = try response.result.get()
+                    //  Update client with token and ID
                     self.client = TwitterAPIClient(.oauth20(.init(clientID: clientID, token: token)))
                     self.showAlert(title: "Success!", message: nil) {
                         self.navigationController?.popViewController(animated: true)
@@ -122,4 +181,19 @@ extension UIViewController {
         })
         present(alert, animated: true)
     }
+}
+
+// Response Wrapper
+public struct TwitterDataResponseV2<DataType: Decodable, Meta: Decodable>: Decodable {
+    public var data: DataType
+    public var meta: Meta?
+}
+
+// Response Decodable Object
+struct TwitterTweetV2: Decodable {
+    struct Meta: Decodable {
+        var resultCount: Int
+    }
+    var id: String
+    var text: String
 }

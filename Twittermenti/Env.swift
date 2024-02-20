@@ -3,7 +3,6 @@
 //  Twittermenti
 //
 //  Created by Kiran Kothapalli on 2/19/24.
-//  Copyright © 2024 London App Brewery. All rights reserved.
 //
 
 import Foundation
@@ -12,11 +11,10 @@ import TwitterAPIKit
 struct Env: Codable {
     // MARK: - OAuth 2.0 Authorization Code Flow with PKCE
     var clientID: String?
-    var clientSecret: String?
-
     var token: TwitterAuthenticationMethod.OAuth20?
 }
 
+//  Use user default storage if other functionalities are added
 extension Env {
     func store(_ defaults: UserDefaults = .standard) {
         let encoder = JSONEncoder()

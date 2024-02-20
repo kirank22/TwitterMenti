@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0F4FB4362B84584500B925F9 /* Env.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4FB4352B84584500B925F9 /* Env.swift */; };
-		0F4FB4382B84587F00B925F9 /* StoryboardInstantiatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4FB4372B84587F00B925F9 /* StoryboardInstantiatable.swift */; };
 		0FECB7AB2B80732500EE006D /* TweetSentimentClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0FECB7AA2B80732500EE006D /* TweetSentimentClassifier.mlmodel */; };
 		0FECB7BF2B80797100EE006D /* SwifteriOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FECB7B52B80793700EE006D /* SwifteriOS.framework */; };
 		0FECB7C02B80797100EE006D /* SwifteriOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0FECB7B52B80793700EE006D /* SwifteriOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -75,7 +74,6 @@
 
 /* Begin PBXFileReference section */
 		0F4FB4352B84584500B925F9 /* Env.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Env.swift; sourceTree = "<group>"; };
-		0F4FB4372B84587F00B925F9 /* StoryboardInstantiatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryboardInstantiatable.swift; sourceTree = "<group>"; };
 		0FECB7AA2B80732500EE006D /* TweetSentimentClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = TweetSentimentClassifier.mlmodel; sourceTree = "<group>"; };
 		0FECB7AC2B80793700EE006D /* Swifter.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Swifter.xcodeproj; path = ../../../../Swifter/Swifter.xcodeproj; sourceTree = "<group>"; };
 		0FECB7C22B807D8600EE006D /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
@@ -143,14 +141,13 @@
 			children = (
 				0FECB7AA2B80732500EE006D /* TweetSentimentClassifier.mlmodel */,
 				AD9EC64F20FE2EF4002AE9BF /* AppDelegate.swift */,
+				0F4FB4352B84584500B925F9 /* Env.swift */,
 				AD9EC65120FE2EF4002AE9BF /* ViewController.swift */,
 				AD9EC65320FE2EF4002AE9BF /* Main.storyboard */,
 				AD9EC65620FE2EF7002AE9BF /* Assets.xcassets */,
 				AD9EC65820FE2EF7002AE9BF /* LaunchScreen.storyboard */,
 				AD9EC65B20FE2EF7002AE9BF /* Info.plist */,
 				0FECB7C22B807D8600EE006D /* Secrets.plist */,
-				0F4FB4352B84584500B925F9 /* Env.swift */,
-				0F4FB4372B84587F00B925F9 /* StoryboardInstantiatable.swift */,
 			);
 			path = Twittermenti;
 			sourceTree = "<group>";
@@ -282,7 +279,6 @@
 				0F4FB4362B84584500B925F9 /* Env.swift in Sources */,
 				AD9EC65220FE2EF4002AE9BF /* ViewController.swift in Sources */,
 				AD9EC65020FE2EF4002AE9BF /* AppDelegate.swift in Sources */,
-				0F4FB4382B84587F00B925F9 /* StoryboardInstantiatable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

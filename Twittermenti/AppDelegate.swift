@@ -2,10 +2,8 @@
 //  AppDelegate.swift
 //  Twittermenti
 //
-//  Created by Angela Yu on 17/07/2019.
-//  Copyright © 2019 London App Brewery. All rights reserved.
+//  Created by Kiran Kothapalli on 2/14/2024
 //
-
 import UIKit
 
 @UIApplicationMain
