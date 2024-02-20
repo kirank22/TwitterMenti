@@ -1,16 +1,14 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "TwitterAPIKit",
-        "repositoryURL": "https://github.com/mironal/TwitterAPIKit",
-        "state": {
-          "branch": null,
-          "revision": "7bbdd82ee0cfd241bbe07f1f7fa1e51a0cf32244",
-          "version": "0.2.3"
-        }
+  "pins" : [
+    {
+      "identity" : "twitterapikit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mironal/TwitterAPIKit",
+      "state" : {
+        "revision" : "7bbdd82ee0cfd241bbe07f1f7fa1e51a0cf32244",
+        "version" : "0.2.3"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 2
 }
